@@ -1,0 +1,58 @@
+MetaScrub — TEST RESULTS (seeded acceptance, run for real on 2026-10-27)
+========================================================================
+Environment: Python 3.12.3 on the Linux test VM; Pillow 10.2.0,
+piexif, PyMuPDF 2.0 (MuPDF 1.28.5).
+Harness: dev/test_acceptance.py (all seed files built programmatically;
+engine imported from repo/metascrub.py; real files throughout, originals
+SHA-256-hashed before/after).
+
+Seed 1 — JPEG (photo.jpg, 64x48):
+  planted: Make TestCamera, Model TestCam X100, Software TestSoft 1.0,
+  Artist Jane Photographer, DateTime/DateTimeOriginal 2024:03:15
+  14:30:45, BodySerialNumber SN-TEST-12345, GPS 37.77500, -122.41944,
+  one embedded EXIF thumbnail (615 bytes).
+  audit findings: 9/9 planted items hit by name.
+  after scrub: recheck GPS 0, serial 0, thumbnail 0, total 0;
+  decoded-pixel hash unchanged: OK.
+
+Seed 2 — DOCX (report.docx, raw zip/XML construction):
+  planted: dc:creator Jane Author, cp:lastModifiedBy John Editor,
+  cp:revision 7, Company Acme Corp, docProps/custom.xml block,
+  4 w:rsid attributes across document XML.
+  audit findings: 6/6 finding groups hit by name.
+  after scrub: recheck 0 target items; file still opens (zip + XML
+  parse); body-text hash unchanged: OK.
+
+Seed 3 — PDF (document.pdf, PyMuPDF):
+  planted: Author Jane Author, Creator MetaScrub Test Creator,
+  Producer TestProducer 1.0, Title Quarterly Report, Subject Internal
+  draft, Keywords draft, XMP metadata stream.
+  audit findings: 7/7 items hit by name.
+  after scrub: recheck 0 target items; file still opens in PyMuPDF;
+  page-text hash unchanged: OK.
+
+Seed 4 — signed PDF (signed.pdf, PyMuPDF signature field):
+  a real signature field was added (field name Signature1,
+  /FT /Sig marker present in the file bytes, signature flags = 3).
+  This is a signature-field marker, NOT a cryptographic signature,
+  and the report describes detection honestly as such.
+  result: detected, skipped (status "skipped — digitally signed,
+  scrubbing would break the signature"), no scrubbed copy produced,
+  report states the skip explicitly.
+
+Global:
+  scan-only mode wrote nothing to the input folder and created no
+  output folder.
+  originals byte-identical (SHA-256) before/after: 4/4 files
+  (photo.jpg, report.docx, document.pdf, signed.pdf).
+
+ACCEPTANCE: 35/35 checks passed.
+
+Two defects found and fixed during this run (both in the harness run,
+not papered over):
+  1. get_sigflags() returns -1 for PDFs with no AcroForm at all; the
+     first version treated any non-zero value as "signed" and flagged
+     every plain PDF. Fixed: only a positive flag value counts.
+  2. The signed-seed check required the literal bytes "/FT /Sig"
+     (with a space); MuPDF writes "/FT/Sig". Fixed the check to the
+     whitespace-tolerant /FT\s*/Sig pattern, matching the engine.
