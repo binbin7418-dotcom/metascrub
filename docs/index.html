@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MetaScrub — Metadata Audit & Scrub: Find, Remove & Verify Hidden Data in Photos, Office & PDF Files</title>
+<meta name="description" content="MetaScrub audits photos, Office files and PDFs for hidden metadata — GPS, camera serial numbers, authors, revision history — removes it, and proves the result with a find, remove, verify-zero report per file. 100% local, one-time $19.">
+<style>
+  body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;margin:0;color:#1c2733;line-height:1.6;background:#fbfcfe}
+  .wrap{max-width:820px;margin:0 auto;padding:32px 20px 64px}
+  h1{font-size:2rem;line-height:1.25;margin:.2em 0}
+  h2{margin-top:2em;font-size:1.25rem}
+  .sub{font-size:1.1rem;color:#43536a}
+  .cta{display:inline-block;background:#0b6e4f;color:#fff;padding:12px 22px;border-radius:8px;text-decoration:none;font-weight:600;margin:16px 0}
+  .card{background:#fff;border:1px solid #e3e9f0;border-radius:10px;padding:18px 20px;margin:14px 0}
+  .num{font-weight:700;color:#0b6e4f}
+  table{border-collapse:collapse;width:100%;margin:8px 0}
+  th,td{border:1px solid #e3e9f0;padding:8px 12px;text-align:left;vertical-align:top}
+  th{background:#f2f6f9}
+  footer{color:#7a8798;font-size:.85rem;margin-top:48px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p><strong>MetaScrub</strong></p>
+  <h1>That photo knows where you live.<br>That document remembers who wrote it.</h1>
+  <p class="sub">Before you send a file out, MetaScrub audits it for the data you cannot see: the GPS coordinates in a photo, the camera serial number, the thumbnail of the part you cropped away, the author and revision history in a Word file, the producer data in a PDF. Then it removes that data, writes a cleaned copy, and hands you a report that proves — per file — that the result is zero. Your originals are never touched.</p>
+  <a class="cta" href="https://binbinster.gumroad.com/l/metascrub-metadata-scrub-report">Get MetaScrub — $19 one-time</a>
+
+  <h2>Three privacy risks hiding in files you already send</h2>
+  <div class="card">
+    <ul>
+      <li><strong>The GPS tag is your home address.</strong> A phone photo carries the exact coordinates where it was taken. Post it, and anyone can read where you live, where your kids go to school, where the listing photos were shot.</li>
+      <li><strong>The thumbnail remembers what you cropped out.</strong> Cropping a photo does not always remove the original — an embedded EXIF thumbnail can still carry the uncropped image. MetaScrub strips the whole EXIF block, thumbnail included.</li>
+      <li><strong>The revision history tells the story you deleted.</strong> A Word file can carry its author, your company, how many revisions it went through, and the fingerprints of every editing session. Sending the "final" version can still hand over the draft history.</li>
+    </ul>
+  </div>
+
+  <h2>The report is the product — find, remove, verify zero</h2>
+  <div class="card">
+    <p>Other metadata cleaners finish with a bare list of "successful" files — no detail about what was actually removed. MetaScrub gives you a per-file triple instead:</p>
+    <ol>
+      <li><strong>Found</strong> — every hidden item named: GPS coordinates, BodySerialNumber, author, company, revision traces, XMP metadata, and more.</li>
+      <li><strong>Removed</strong> — what the scrub took out of the cleaned copy.</li>
+      <li><strong>Rechecked zero</strong> — the cleaned copy is audited again, and the report must read 0 target items remaining. If it does not, you see it.</li>
+    </ol>
+    <p>And the content itself is verified untouched: photo pixels are hash-checked, document and PDF text are hash-checked, and every cleaned file is verified to still open.</p>
+  </div>
+
+  <h2>What it covers</h2>
+  <div class="card">
+    <table>
+      <tr><th>File type</th><th>What is audited</th><th>What scrubbing does</th></tr>
+      <tr><td>JPEG photos</td><td>GPS coordinates, camera Make/Model, serial numbers, software, artist, dates, embedded EXIF thumbnail</td><td>Strips the whole EXIF block at byte level; pixels never re-encoded</td></tr>
+      <tr><td>Word / Excel / PowerPoint</td><td>Author, last editor, revision number, company, custom properties, revision traces (rsid attributes)</td><td>Empties author/editor, resets revision, empties company, removes custom properties, strips rsid attributes; body text untouched</td></tr>
+      <tr><td>PDF</td><td>Author, Creator, Producer, Title, Subject, Keywords, XMP metadata</td><td>Empties info-dictionary fields and XMP metadata; page text untouched</td></tr>
+    </table>
+  </div>
+
+  <h2>Before / after — our seeded acceptance test, measured</h2>
+  <div class="card">
+    <table>
+      <tr><th></th><th>Before</th><th>After MetaScrub</th></tr>
+      <tr><td>JPEG with GPS + serial + thumbnail</td><td>9 hidden items found, including GPS 37.77500, -122.41944 and serial SN-TEST-12345</td><td><span class="num">0 items remaining</span>; decoded-pixel hash unchanged</td></tr>
+      <tr><td>DOCX with author + company + revision traces</td><td>6 finding groups, including author Jane Author, Company Acme Corp, revision 7, 4 rsid attributes</td><td><span class="num">0 items remaining</span>; file still opens; body-text hash unchanged</td></tr>
+      <tr><td>PDF with Author + Producer + XMP</td><td>7 hidden items found</td><td><span class="num">0 items remaining</span>; file still opens; page-text hash unchanged</td></tr>
+      <tr><td>PDF carrying a signature field</td><td>Signature field present (/FT /Sig marker, signature flags 3)</td><td><span class="num">Skipped, not scrubbed</span> — no cleaned copy produced, report states the skip explicitly</td></tr>
+      <tr><td>Your original files</td><td>untouched</td><td>untouched (SHA-256 verified in testing, 4/4 files)</td></tr>
+    </table>
+    <p>Full seeded acceptance run: <span class="num">35/35 checks passed</span>. Scan-only mode writes nothing — audit first, scrub when you are ready.</p>
+  </div>
+
+  <h2>How it works</h2>
+  <div class="card">
+    <ol>
+      <li>Point MetaScrub at a folder of photos, Office files and PDFs</li>
+      <li>Run a scan-only report first if you like; it writes nothing</li>
+      <li>Or scrub: get cleaned copies in a new folder plus the find, remove, verify-zero report, and send the cleaned copies instead</li>
+    </ol>
+    <p>Windows 10/11. No account, no subscription, no upload — the whole point is that your files never leave your computer.</p>
+  </div>
+
+  <a class="cta" href="https://binbinster.gumroad.com/l/metascrub-metadata-scrub-report">Get MetaScrub — $19 one-time</a>
+
+  <footer>
+    <p>Honest limits: v1 covers JPEG photos, Office files (docx/xlsx/pptx) and PDFs. PNG, HEIC, TIFF, RAW, video and audio metadata are not scrubbed in this version and are reported as unsupported, never force-converted. Digitally signed PDFs are detected by signature flags and/or a signature-field marker in the file and skipped, never scrubbed, because changing the file would break the signature; detection is marker detection only, not a cryptographic validation of the signature. A scrubbed file is not certified or compliant with any law, standard or platform policy, and scrubbing does not remove tracked-change content itself — only the rsid revision-trace attributes. The report lists exactly what was found and removed; read it before sending anything sensitive.</p>
+  </footer>
+</div>
+</body>
+</html>
